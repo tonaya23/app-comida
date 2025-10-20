@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "428548615315",
+    "project_id": "foodexpress-2b5b0",
+    "storage_bucket": "foodexpress-2b5b0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:428548615315:android:b8811e65ba86c8c2f83166",
+        "android_client_info": {
+          "package_name": "com.foodexpress.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtw5Zpwd7P_YLaeAqgvwmNUtZG6YJjVEk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>FoodExpress - App de Comida Rápida</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="js/weather.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-utensils"></i>
+                <span>FoodExpress</span>
+            </div>
+        </header>
+
+        <!-- Pantalla de Inicio de Sesión -->
+        <div id="login-screen" class="screen active">
+            <h2>Bienvenido a FoodExpress</h2>
+            <p>Inicia sesión para realizar tu pedido</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <i class="fas fa-hamburger" style="font-size: 80px; color: #ff7b00;"></i>
+            </div>
+            
+            <div class="form-group">
+                <label for="login-email">Correo Electrónico</label>
+                <input type="email" id="login-email" class="form-control" placeholder="tu@email.com" autocomplete="email">
+            </div>
+            
+            <div class="form-group">
+                <label for="login-password">Contraseña</label>
+                <input type="password" id="login-password" class="form-control" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            
+            <button class="btn btn-primary btn-lg" id="login-btn">
+                Iniciar Sesión
+            </button>
+
+            <button class="btn btn-secondary btn-lg" id="go-to-register-btn" style="margin-top: 10px;">
+                Crear Cuenta
+            </button>
+        </div>
+
+        <!-- Pantalla de Registro -->
+        <div id="register-screen" class="screen">
+            <h2>Crear Cuenta</h2>
+            <p>Regístrate para empezar a pedir</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <i class="fas fa-user-plus" style="font-size: 80px; color: #ff7b00;"></i>
+            </div>
+            
+            <div class="form-group">
+                <label for="register-email">Correo Electrónico</label>
+                <input type="email" id="register-email" class="form-control" placeholder="tu@email.com" autocomplete="email">
+            </div>
+            
+            <div class="form-group">
+                <label for="register-password">Contraseña</label>
+                <input type="password" id="register-password" class="form-control" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-password">Confirmar Contraseña</label>
+                <input type="password" id="confirm-password" class="form-control" placeholder="Repite tu contraseña" autocomplete="new-password">
+            </div>
+            
+            <button class="btn btn-primary btn-lg" id="register-btn">
+                Crear Cuenta
+            </button>
+
+            <button class="btn btn-secondary btn-lg" id="go-to-login-btn" style="margin-top: 10px;">
+                ¿Ya tienes cuenta? Inicia Sesión
+            </button>
+        </div>
+
+        <!-- Pantalla de Perfil de Usuario -->
+        <div id="profile-screen" class="screen">
+            <h2>Mi Cuenta</h2>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <i class="fas fa-user-circle" style="font-size: 80px; color: #ff7b00;"></i>
+                <h3 id="user-email" style="margin: 10px 0;">usuario@ejemplo.com</h3>
+            </div>
+            
+            <div class="order-summary">
+                <h3>Información de la cuenta</h3>
+                <div class="summary-item">
+                    <span>Estado:</span>
+                    <span style="color: #28a745;">Activa</span>
+                </div>
+                <div class="summary-item">
+                    <span>Miembro desde:</span>
+                    <span id="member-since">Hoy</span>
+                </div>
+            </div>
+            
+            <button class="btn btn-secondary btn-lg" id="back-to-menu-profile">
+                <i class="fas fa-utensils"></i> Volver al Menú
+            </button>
+            
+            <button class="btn btn-primary btn-lg" id="logout-btn" style="margin-top: 10px;">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+        </div>
+
+        <!-- Pantalla de Administración -->
+        <div id="admin-screen" class="screen">
+            <!-- El contenido se genera dinámicamente -->
+        </div>
+
+        <!-- Pantalla Principal con Menú -->
+        <div id="menu-screen" class="screen">
+            <h2>Nuestro Menú</h2>
+            <p>Selecciona tus productos favoritos</p>
+            <div class="weather-container">
+        <div class="weather-widget" id="weather-widget">
+            <div class="weather-loading">
+                <i class="fas fa-sync fa-spin"></i>
+                Cargando clima...
+            </div>
+        </div>
+        <div id="weather-recommendation"></div>
+    </div>
+            <div id="menu-content">
+                <!-- Los productos se cargan dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Pantalla de Detalle de Producto -->
+        <div id="detail-screen" class="screen">
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="back-from-detail">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+            </div>
+            
+            <img id="detail-img" src="" class="product-detail-img" alt="">
+            
+            <h2 id="detail-title" class="product-detail-title"></h2>
+            <div id="detail-price" class="product-detail-price"></div>
+            
+            <p id="detail-desc" class="product-detail-desc"></p>
+            
+            <div class="form-group">
+                <label>Ingredientes adicionales</label>
+                <div>
+                    <input type="checkbox" id="bacon"> <label for="bacon">Tocino (+$1.50)</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="avocado"> <label for="avocado">Aguacate (+$1.00)</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="egg"> <label for="egg">Huevo (+$1.00)</label>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary btn-lg" id="add-to-cart-detail">
+                <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+            </button>
+        </div>
+
+        <!-- Pantalla de Carrito de Compras -->
+        <div id="cart-screen" class="screen">
+            <h2>Tu Carrito</h2>
+            <p>Revisa y confirma tu pedido</p>
+            
+            <div id="cart-items">
+                <!-- Los elementos del carrito se generan dinámicamente -->
+            </div>
+            
+            <div class="order-summary">
+                <h3>Resumen del Pedido</h3>
+                <div class="summary-item">
+                    <span>Subtotal</span>
+                    <span id="subtotal">$0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span>Envío</span>
+                    <span id="shipping">$2.50</span>
+                </div>
+                <div class="summary-item">
+                    <span>Impuestos</span>
+                    <span id="taxes">$0.00</span>
+                </div>
+                <div class="summary-total">
+                    <span>Total</span>
+                    <span id="total">$0.00</span>
+                </div>
+            </div>
+            
+            <button class="btn btn-success btn-lg" id="checkout-btn">
+                Continuar con la Compra
+            </button>
+            
+            <button class="btn btn-secondary btn-lg" id="back-to-menu-cart" style="margin-top: 10px;">
+                Seguir Comprando
+            </button>
+        </div>
+
+        <!-- Pantalla de Confirmación de Pedido -->
+        <div id="confirm-screen" class="screen">
+            <h2>Confirmar Pedido</h2>
+            <p>Revisa los detalles de tu pedido</p>
+            
+            <div class="order-summary">
+                <h3>Resumen del Pedido</h3>
+                <div class="summary-item">
+                    <span>Productos</span>
+                    <span id="confirm-subtotal">$0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span>Envío</span>
+                    <span id="confirm-shipping">$2.50</span>
+                </div>
+                <div class="summary-item">
+                    <span>Impuestos</span>
+                    <span id="confirm-taxes">$0.00</span>
+                </div>
+                <div class="summary-total">
+                    <span>Total</span>
+                    <span id="confirm-total">$0.00</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="address">Dirección de Entrega</label>
+                <input type="text" id="address" class="form-control" placeholder="Ingresa tu dirección">
+            </div>
+            
+            <div class="form-group">
+                <label for="payment">Método de Pago</label>
+                <select id="payment" class="form-control">
+                    <option>Tarjeta de Crédito/Débito</option>
+                    <option>Efectivo contra Entrega</option>
+                    <option>PayPal</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-success btn-lg" id="confirm-order-btn">
+                <i class="fas fa-check-circle"></i> Confirmar Pedido
+            </button>
+            
+            <button class="btn btn-secondary btn-lg" id="back-to-cart" style="margin-top: 10px;">
+                <i class="fas fa-arrow-left"></i> Volver al Carrito
+            </button>
+        </div>
+
+        <!-- Pantalla de Estado del Pedido -->
+        <div id="status-screen" class="screen">
+            <div class="order-status" id="order-status-content">
+                <!-- El contenido se genera dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Navegación Inferior -->
+    <div id="bottom-nav" class="bottom-nav" style="display: none;">
+        <div class="nav-item active" data-screen="menu-screen">
+            <i class="fas fa-utensils nav-icon"></i>
+            <span>Menú</span>
+        </div>
+        <div class="nav-item" data-screen="cart-screen">
+            <i class="fas fa-shopping-cart nav-icon"></i>
+            <span>Carrito</span>
+        </div>
+        <div class="nav-item" data-screen="status-screen">
+            <i class="fas fa-clock nav-icon"></i>
+            <span>Pedidos</span>
+        </div>
+        <div class="nav-item" data-screen="admin-screen" style="display: none;">
+            <i class="fas fa-cog nav-icon"></i>
+            <span>Admin</span>
+        </div>
+        <div class="nav-item" data-screen="profile-screen">
+            <i class="fas fa-user nav-icon"></i>
+            <span>Cuenta</span>
+        </div>
+    </div>
+
+    <script src="cordova.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
